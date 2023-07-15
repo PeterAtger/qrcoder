@@ -1,4 +1,5 @@
 import 'package:path/path.dart' as pathlib;
+import 'package:qrcoder/Models/person.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -10,7 +11,7 @@ class DatabaseHelper {
 
   static const columnId = '_id';
   static const columnName = 'name';
-  static const columnGroup = 'group';
+  static const columnGroup = 'group_name';
   static const columnPoints = 'points';
 
   late Database _db;
@@ -32,7 +33,7 @@ class DatabaseHelper {
           CREATE TABLE $table (
             $columnId INTEGER PRIMARY KEY,
             $columnName TEXT NOT NULL,
-            $columnGroup TEXT NOT NULL
+            $columnGroup TEXT NOT NULL,
             $columnPoints INTEGER NOT NULL
           )
           ''');
@@ -45,6 +46,14 @@ class DatabaseHelper {
   // inserted row.
   Future<int> insert(Map<String, dynamic> row) async {
     return await _db.insert(table, row);
+  }
+
+  Future<int> insertPerson(Person person) async {
+    var personExists = await _db.query(table,
+        where: '$columnName = ?', whereArgs: [person.name], limit: 1);
+
+    print(personExists);
+    return 1;
   }
 
   // All of the rows are returned as a list of maps, where each map is
@@ -80,5 +89,15 @@ class DatabaseHelper {
       where: '$columnId = ?',
       whereArgs: [id],
     );
+  }
+
+  Future<List<Person>> getData() async {
+    List<Map<String, Object?>> results = await _db.query(table);
+    List<Person> people = [];
+    results.asMap().forEach((key, value) {
+      people.add(Person(name: 'Peter', group: 'Eleia'));
+    });
+
+    return people;
   }
 }

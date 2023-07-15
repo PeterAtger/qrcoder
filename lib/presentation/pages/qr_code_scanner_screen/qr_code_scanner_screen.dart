@@ -1,26 +1,43 @@
 import 'package:flutter/material.dart';
 import 'package:barcode_scan2/barcode_scan2.dart';
 import 'package:flutter/services.dart';
+import 'package:qrcoder/Controller/db_helper.dart';
+import 'package:qrcoder/Models/person.dart';
+import 'package:qrcoder/ResourceModels/person_from_bar.dart';
 import 'dart:convert';
 
 import 'package:qrcoder/presentation/components/data_table.dart';
 
 class QRCodeScannerScreen extends StatelessWidget {
-  const QRCodeScannerScreen({super.key});
+  final DatabaseHelper database;
+  QRCodeScannerScreen({super.key, required this.database});
+
+  final List<Person> people = [
+    Person(name: 'a', group: 'ba'),
+    Person(name: 'a', group: 'ta')
+  ];
 
   Future<void> scanQRCode(BuildContext context) async {
     try {
+      String name = '';
       ScanResult barcode = await BarcodeScanner.scan();
-      var text = jsonDecode(barcode.rawContent)["الاسم"];
-      // print(barcode.rawContent);
-      print(text);
+      String rawContent = barcode.rawContent;
+      PersonFromBar personConverter = PersonFromBar(barCodeData: rawContent);
+      // Either Person object or 0
+      var person = personConverter.getPerson();
+      if (person != 0) {
+        name = person.name;
+      } else {
+        name = rawContent;
+      }
+
       // ignore: use_build_context_synchronously
       showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: const Text('Scanned QR Code'),
-            content: Text(jsonDecode(barcode.rawContent)["الاسم"]),
+            title: const Text('Scanned QR code'),
+            content: Text(name),
             actions: [
               TextButton(
                 child: const Text('OK'),
@@ -99,12 +116,21 @@ class QRCodeScannerScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('QR Code Scanner'),
+        title: const Text('QR Coder'),
       ),
-      body: CustomDataTable(
-        key: const Key('table'),
-        data: [],
-      ),
+      body: FutureBuilder(
+          future: database.getData(),
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+            return CustomDataTable(
+              key: const Key('table'),
+              data: snapshot.data!,
+            );
+          }),
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.qr_code),
         onPressed: () => scanQRCode(context),
