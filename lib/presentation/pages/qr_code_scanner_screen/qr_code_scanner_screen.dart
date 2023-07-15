@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:barcode_scan2/barcode_scan2.dart';
 import 'package:flutter/services.dart';
-import 'package:qrcoder/Controller/db_helper.dart';
+import 'package:qrcoder/db/db_helper.dart';
 import 'package:qrcoder/ResourceModels/person_from_bar.dart';
 import 'package:qrcoder/presentation/components/group_data_table.dart';
 import 'dart:convert';

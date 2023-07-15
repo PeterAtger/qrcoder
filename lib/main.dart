@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:qrcoder/Controller/db_helper.dart';
+import 'package:qrcoder/db/db_helper.dart';
 import 'package:qrcoder/presentation/pages/qr_code_scanner_screen/qr_code_scanner_screen.dart';
 
 void main() async {
@@ -29,9 +29,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'QR Coder',
-      theme: ThemeData(
-        primarySwatch: Colors.indigo,
-      ),
+      theme: ThemeData(primarySwatch: Colors.indigo),
       home: QRCodeScannerScreen(database: database),
     );
   }

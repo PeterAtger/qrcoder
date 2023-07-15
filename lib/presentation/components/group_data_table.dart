@@ -10,7 +10,7 @@ class GroupDataTable extends StatefulWidget {
 }
 
 class _GroupDataTableState extends State<GroupDataTable> {
-  int _currentSortColumn = 1;
+  int _currentSortColumn = -1;
   bool _isAscending = true;
 
   @override
@@ -21,7 +21,7 @@ class _GroupDataTableState extends State<GroupDataTable> {
       width: double.infinity,
       child: SingleChildScrollView(
         child: DataTable(
-          sortColumnIndex: _currentSortColumn,
+          sortColumnIndex: _currentSortColumn == -1 ? null : _currentSortColumn,
           sortAscending: _isAscending,
           columns: [
             DataColumn(

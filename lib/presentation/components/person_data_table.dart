@@ -10,7 +10,7 @@ class PersonDataTable extends StatefulWidget {
 }
 
 class _PersonDataTableState extends State<PersonDataTable> {
-  int _currentSortColumn = 2;
+  int _currentSortColumn = -1;
   bool _isAscending = true;
 
   @override
@@ -21,7 +21,7 @@ class _PersonDataTableState extends State<PersonDataTable> {
       width: double.infinity,
       child: SingleChildScrollView(
         child: DataTable(
-          sortColumnIndex: _currentSortColumn,
+          sortColumnIndex: _currentSortColumn == -1 ? null : _currentSortColumn,
           sortAscending: _isAscending,
           columns: [
             DataColumn(
