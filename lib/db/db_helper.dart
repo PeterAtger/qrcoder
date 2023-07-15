@@ -59,7 +59,7 @@ class DatabaseHelper {
       return await insert({
         columnName: person.name,
         columnGroup: person.group,
-        columnPoints: 0
+        columnPoints: 1
       });
     }
 
