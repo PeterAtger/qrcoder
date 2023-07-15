@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:path/path.dart' as pathlib;
 import 'package:qrcoder/Models/person.dart';
 import 'package:sqflite/sqflite.dart';
@@ -31,7 +33,7 @@ class DatabaseHelper {
   Future _onCreate(Database db, int version) async {
     await db.execute('''
           CREATE TABLE $table (
-            $columnId INTEGER PRIMARY KEY,
+            $columnId INTEGER PRIMARY KEY AUTOINCREMENT,
             $columnName TEXT NOT NULL,
             $columnGroup TEXT NOT NULL,
             $columnPoints INTEGER NOT NULL
@@ -49,11 +51,22 @@ class DatabaseHelper {
   }
 
   Future<int> insertPerson(Person person) async {
-    var personExists = await _db.query(table,
+    List personExists = await _db.query(table,
         where: '$columnName = ?', whereArgs: [person.name], limit: 1);
 
-    print(personExists);
-    return 1;
+    if (personExists.isEmpty) {
+      return await insert({
+        columnName: person.name,
+        columnGroup: person.group,
+        columnPoints: 0
+      });
+    }
+
+    Map<String, Object?> oldPerson = personExists[0];
+    return update({
+      columnId: oldPerson[columnId],
+      columnPoints: int.parse(oldPerson[columnPoints].toString()) + 1
+    });
   }
 
   // All of the rows are returned as a list of maps, where each map is
@@ -94,8 +107,14 @@ class DatabaseHelper {
   Future<List<Person>> getData() async {
     List<Map<String, Object?>> results = await _db.query(table);
     List<Person> people = [];
+    print('Tataaa');
+    print(results);
     results.asMap().forEach((key, value) {
-      people.add(Person(name: 'Peter', group: 'Eleia'));
+      print(value[columnName]);
+      people.add(Person(
+          name: value[columnName].toString(),
+          group: value[columnGroup].toString(),
+          points: int.parse(value[columnPoints].toString())));
     });
 
     return people;

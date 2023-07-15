@@ -8,15 +8,15 @@ import 'dart:convert';
 
 import 'package:qrcoder/presentation/components/data_table.dart';
 
-class QRCodeScannerScreen extends StatelessWidget {
+class QRCodeScannerScreen extends StatefulWidget {
   final DatabaseHelper database;
-  QRCodeScannerScreen({super.key, required this.database});
+  const QRCodeScannerScreen({super.key, required this.database});
 
-  final List<Person> people = [
-    Person(name: 'a', group: 'ba'),
-    Person(name: 'a', group: 'ta')
-  ];
+  @override
+  State<QRCodeScannerScreen> createState() => _QRCodeScannerScreenState();
+}
 
+class _QRCodeScannerScreenState extends State<QRCodeScannerScreen> {
   Future<void> scanQRCode(BuildContext context) async {
     try {
       String name = '';
@@ -27,6 +27,8 @@ class QRCodeScannerScreen extends StatelessWidget {
       var person = personConverter.getPerson();
       if (person != 0) {
         name = person.name;
+        widget.database.insertPerson(person);
+        setState(() {});
       } else {
         name = rawContent;
       }
@@ -119,7 +121,7 @@ class QRCodeScannerScreen extends StatelessWidget {
         title: const Text('QR Coder'),
       ),
       body: FutureBuilder(
-          future: database.getData(),
+          future: widget.database.getData(),
           builder: (context, snapshot) {
             if (!snapshot.hasData) {
               return const Center(
