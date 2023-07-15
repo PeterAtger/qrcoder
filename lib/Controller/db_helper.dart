@@ -1,6 +1,7 @@
 import 'dart:ffi';
 
 import 'package:path/path.dart' as pathlib;
+import 'package:qrcoder/Models/group.dart';
 import 'package:qrcoder/Models/person.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
@@ -107,10 +108,7 @@ class DatabaseHelper {
   Future<List<Person>> getData() async {
     List<Map<String, Object?>> results = await _db.query(table);
     List<Person> people = [];
-    print('Tataaa');
-    print(results);
     results.asMap().forEach((key, value) {
-      print(value[columnName]);
       people.add(Person(
           name: value[columnName].toString(),
           group: value[columnGroup].toString(),
@@ -118,5 +116,22 @@ class DatabaseHelper {
     });
 
     return people;
+  }
+
+  Future<List<Group>> getGroupData() async {
+    const String totalPoints = 'total_points';
+
+    List<Map<String, Object?>> results = await _db.query(table,
+        columns: [columnGroup, 'SUM($columnPoints) as $totalPoints'],
+        groupBy: columnGroup,
+        orderBy: columnGroup);
+    List<Group> groups = [];
+    results.asMap().forEach((key, value) {
+      groups.add(Group(
+          group: value[columnGroup].toString(),
+          points: int.parse(value[totalPoints].toString())));
+    });
+
+    return groups;
   }
 }
